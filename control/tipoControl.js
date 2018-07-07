@@ -14,8 +14,7 @@ app.controller('typeControl',function($scope,$http){
 	}
 	
 	$scope.novo = function(){
-		$scope.researcher = {};
-		$scope.researcher.telefones = [];
+		$scope.type = {};
 		$scope.mensagens = [];
 	}
 	
@@ -28,20 +27,50 @@ app.controller('typeControl',function($scope,$http){
 	}
 
 	
-    $scope.salvar = function() {    	
-    	$scope.researcher.push($scope.reseacher);
-		$scope.novo();
-		$scope.mensagens.push('Pesquisador salvo com sucesso');
+	$scope.salvar = function() {
+		
+		if ($scope.type.id == undefined || $scope.type.id == '') {    		
+			alert('Tentou salvar!');
+			$http.post(url,$scope.type).success(function(tipoRetornado) {				
+				$scope.tipos.push(tipoRetornado);
+				$scope.novo();
+				$scope.mensagens.push('Tipo salvo com sucesso');
+				
+			}).error(function (erro) {
+				$scope.mensagens.push('Erro ao salvar o Tipo: '+JSON.stringify(erro));
+			});
+		}
+		
+		else{
+		
+			alert('Método Atualizar!');
+				$http.put(url,$scope.type).success(function(tipo) {
+					$scope.pesquisar();
+					$scope.novo();
+					$scope.mensagens.push('Tipo de pesquisa atualizado com sucesso');
+				
+				}).error(function (erro) {
+				alert('Erro ao atualizar o tipo de pesquisa');
+			});
+		
+		}
 	}
 	
+	
 	$scope.excluir = function() {
-		if ($scope.researcher.codigo == '') {
-			alert('Selecione um Pesquisador');
+	
+		if ($scope.type.id == '') {
+			alert('Selecione um Tipo');
 		} else {
-			$scope.pesquisadores.splice($scope.pesquisadores.indexOf($scope.researcher),1);
-			$scope.pesquisar();
-			$scope.novo();
-			$scope.mensagens.push('Pesquisador excluído com sucesso');
+		    $http.delete(url+"/"+$scope.type.id).success(function() {
+				$scope.tipos.splice($scope.tipos.indexOf($scope.type),1);
+				$scope.pesquisar();
+				$scope.novo();
+				$scope.mensagens.push('Tipo excluído com sucesso');
+				
+			}).error(function (erro) {
+				alert("Erro ao excluir!")
+			});
 		}
 	}
 

@@ -14,8 +14,7 @@ app.controller('projectControl',function($scope,$http){
 	}
 	
 	$scope.novo = function(){
-		$scope.researcher = {};
-		$scope.researcher.telefones = [];
+		$scope.projeto = {};
 		$scope.mensagens = [];
 	}
 	
@@ -27,21 +26,51 @@ app.controller('projectControl',function($scope,$http){
 		});
 	}
 
-	
-    $scope.salvar = function() {    	
-    	$scope.researcher.push($scope.reseacher);
-		$scope.novo();
-		$scope.mensagens.push('Pesquisador salvo com sucesso');
+	$scope.salvar = function() {
+		
+		if ($scope.projeto.id == undefined || $scope.projeto.id == '') {
+		
+			alert('Tentou salvar!');
+			$http.post(url,$scope.projeto).success(function(projetoRetornado) {				
+				$scope.projetos.push(projetoRetornado);
+				$scope.novo();
+				$scope.mensagens.push('Projeto salvo com sucesso');
+				
+			}).error(function (erro) {
+				$scope.mensagens.push('Erro ao salvar o Projeto: '+JSON.stringify(erro));
+			});
+		}
+		
+		
+		else{
+		
+			alert('Método Atualizar!');
+				$http.put(url,$scope.projeto).success(function(projeto) {
+					$scope.pesquisar();
+					$scope.novo();
+					$scope.mensagens.push('Projeto atualizado com sucesso');
+				
+				}).error(function (erro) {
+				alert('Erro ao atualizar o projeto');
+			});
+		
+		}
 	}
 	
 	$scope.excluir = function() {
-		if ($scope.researcher.codigo == '') {
-			alert('Selecione um Pesquisador');
+	
+		if ($scope.projeto.id == '') {
+			alert('Selecione um Projeto');
 		} else {
-			$scope.pesquisadores.splice($scope.pesquisadores.indexOf($scope.researcher),1);
-			$scope.pesquisar();
-			$scope.novo();
-			$scope.mensagens.push('Pesquisador excluído com sucesso');
+		    $http.delete(url+"/"+$scope.projeto.id).success(function() {
+				$scope.projetos.splice($scope.projetos.indexOf($scope.projeto),1);
+				$scope.pesquisar();
+				$scope.novo();
+				$scope.mensagens.push('Projeto excluído com sucesso');
+				
+			}).error(function (erro) {
+				alert("Erro ao excluir!")
+			});
 		}
 	}
 
